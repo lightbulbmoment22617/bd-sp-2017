@@ -1,32 +1,29 @@
-#!/usr/bin/env python3
+#!usr/bin/env python3
 import sys
 
 current_hour = None
-average_power = 0
+current_total = 0
+current_count = 0
 
 for line in sys.stdin:
     line = line.strip()
 
-    # output from mapper is (floor zone, 1)
-    hour, power = line.split("\t", 1)
-
-    # check input validity
-    try:
-        hour = int(hour)
-        power = float(power)
-    except ValueError:
-        continue
+    # output from combiner is (hour, [list of power measurements])
+    hour, powers = line.split("\t", 1)
+    powers = powers.split()
 
     if (hour == current_hour):
-        # update the average
-        average_power = (average_power + power) / 2
+        current_total += sum([float(x) for x in powers])
+        current_count += len(powers)
     else:
-        if (current_hour is not None):
-            print("%s\t%s" % (current_hour, average_power))
+        if (current_hour is not None and current_count > 0):
+             average = current_total / current_count
+             print("%s\t%s" % (current_hour, average))
 
         current_hour = hour
-        average_power = power
+        current_total = sum([float(x) for x in powers])
+        current_count = len(powers)
 
-# output final count
-if (current_hour):
-    print("%s\t%s" % (current_hour, average_power))
+if (current_hour is not None and current_count > 0):
+    average = current_total / current_count
+    print("%s\t%s" % (current_hour, average))
