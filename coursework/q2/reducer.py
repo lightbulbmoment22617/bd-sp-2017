@@ -28,7 +28,7 @@ for line in sys.stdin:
         # update the count of number of visits
         current_count += count
     else:
-        if (current_fz):
+        if (current_fz is not None):
             update_max(current_count, current_fz)
 
         current_fz = fz
